@@ -1,6 +1,15 @@
 import { asciiToHtml, generateCSS } from './packages/core/src/index.js';
 
-const diagram = `
+// シンプルな図（ボックス → 矢印 → ボックス）
+// 全角文字は幅2、▶は幅2なので、→（幅1）を使用
+const simpleDiagram = `
+┌────────────┐    ┌────────────┐
+│  ユーザー  │───→│  Exchange  │
+└────────────┘    └────────────┘
+`;
+
+// 複雑な図
+const complexDiagram = `
 ┌─────────────────────────────────────────────────────┐
 │         電子決済取引業者（G.U.Exchange）の役割        │
 ├─────────────────────────────────────────────────────┤
@@ -27,6 +36,8 @@ const diagram = `
 │                                                     │
 └─────────────────────────────────────────────────────┘
 `;
+
+const diagram = simpleDiagram;
 
 console.log('=== ASCII Input ===');
 console.log(diagram);

@@ -11,11 +11,17 @@
   --ascii-border-radius: 4px;
 
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  flex-direction: column;
   gap: 0.5rem;
   padding: 1rem;
   font-family: ui-monospace, monospace;
+}
+
+.ascii-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 /* Dark mode */
@@ -103,42 +109,18 @@
 
   <h2>Rendered Output:</h2>
   <div class="ascii-diagram">
-  <div class="ascii-box ascii-box-single">G.U.Exchange（電子決済取引業者）
-【ライセンス】
-・電子決済取引業
-・暗号資産交換業
-【業務】
-・ユーザー口座管理（KYC/AML）
-・ステーブルコインの売買</div>
+  <div class="ascii-row">
+  <div class="ascii-box ascii-box-single">ユーザー</div>
+<div class="ascii-arrow ascii-arrow-right"></div>
+  <div class="ascii-box ascii-box-single">Exchange</div>
+  </div>
 </div>
 
   <h2>Original ASCII:</h2>
   <pre>
-┌─────────────────────────────────────────────────────┐
-│         電子決済取引業者（G.U.Exchange）の役割        │
-├─────────────────────────────────────────────────────┤
-│                                                     │
-│  一般ユーザー                                        │
-│      │                                              │
-│      │ 口座開設、チャージ、換金、送金                 │
-│      ▼                                              │
-│  ┌─────────────────────────────────────────────┐   │
-│  │     G.U.Exchange（電子決済取引業者）          │   │
-│  │                                             │   │
-│  │  【ライセンス】                              │   │
-│  │  ・電子決済取引業                            │   │
-│  │  ・暗号資産交換業                            │   │
-│  │                                             │   │
-│  │  【業務】                                    │   │
-│  │  ・ユーザー口座管理（KYC/AML）               │   │
-│  │  ・ステーブルコインの売買                    │   │
-│  └─────────────────────────────────────────────┘   │
-│      │                                              │
-│      │ 発行申請、償還申請                           │
-│      ▼                                              │
-│  信託会社（受託者）                                  │
-│                                                     │
-└─────────────────────────────────────────────────────┘
+┌────────────┐    ┌────────────┐
+│  ユーザー  │───→│  Exchange  │
+└────────────┘    └────────────┘
 </pre>
 </body>
 </html>

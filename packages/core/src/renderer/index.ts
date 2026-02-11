@@ -1,4 +1,4 @@
-import type { Diagram, DiagramNode, BoxNode, AsciiDiagramOptions } from '../types';
+import type { Diagram, DiagramNode, BoxNode, ArrowNode, TextNode, AsciiDiagramOptions } from '../types';
 import { parse } from '../parser';
 import { generateCSS, getDefaultCSS } from './css';
 
@@ -16,9 +16,63 @@ export function render(diagram: Diagram, options?: AsciiDiagramOptions): string 
   const opts = { ...DEFAULT_OPTIONS, ...options };
   const prefix = opts.classPrefix;
 
-  const nodeHtml = diagram.nodes.map((node) => renderNode(node, opts)).join('\n');
+  // Sort nodes by position (top to bottom, left to right)
+  const sortedNodes = [...diagram.nodes].sort((a, b) => {
+    if (a.y !== b.y) return a.y - b.y;
+    return a.x - b.x;
+  });
 
-  return `<div class="${prefix}-diagram">\n${nodeHtml}\n</div>`;
+  // Group nodes by row for layout
+  const rows = groupNodesByRow(sortedNodes);
+  const rowHtml = rows.map((row) => renderRow(row, opts)).join('\n');
+
+  return `<div class="${prefix}-diagram">\n${rowHtml}\n</div>`;
+}
+
+/**
+ * Group nodes into rows based on vertical position
+ */
+function groupNodesByRow(nodes: DiagramNode[]): DiagramNode[][] {
+  const rows: DiagramNode[][] = [];
+  let currentRow: DiagramNode[] = [];
+  let currentY = -1;
+
+  for (const node of nodes) {
+    // Check if this node overlaps with current row vertically
+    if (currentY === -1 || Math.abs(node.y - currentY) <= 1) {
+      currentRow.push(node);
+      if (currentY === -1) currentY = node.y;
+    } else {
+      if (currentRow.length > 0) {
+        // Sort row by x position before adding
+        currentRow.sort((a, b) => a.x - b.x);
+        rows.push(currentRow);
+      }
+      currentRow = [node];
+      currentY = node.y;
+    }
+  }
+
+  if (currentRow.length > 0) {
+    // Sort final row by x position
+    currentRow.sort((a, b) => a.x - b.x);
+    rows.push(currentRow);
+  }
+
+  return rows;
+}
+
+/**
+ * Render a row of nodes
+ */
+function renderRow(nodes: DiagramNode[], opts: Required<AsciiDiagramOptions>): string {
+  const prefix = opts.classPrefix;
+
+  if (nodes.length === 0) return '';
+
+  const nodeHtml = nodes.map((node) => renderNode(node, opts)).join('\n');
+
+  return `  <div class="${prefix}-row">\n${nodeHtml}\n  </div>`;
 }
 
 /**

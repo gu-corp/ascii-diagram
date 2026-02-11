@@ -17,10 +17,12 @@ describe('parse', () => {
   });
 
   it('should parse a box with Japanese text', () => {
+    // 全角文字は幅2なので、ボックス幅を適切に設定
+    // ユーザー = 4文字 × 幅2 = 8列
     const input = `
-┌──────┐
-│ユーザー│
-└──────┘
+┌──────────┐
+│ ユーザー │
+└──────────┘
 `.trim();
 
     const result = parse(input);

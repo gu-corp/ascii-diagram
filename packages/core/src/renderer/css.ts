@@ -15,11 +15,17 @@ export function generateCSS(options?: AsciiDiagramOptions): string {
   --${prefix}-border-radius: 4px;
 
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  flex-direction: column;
   gap: 0.5rem;
   padding: 1rem;
   font-family: ${fontFamily};
+}
+
+.${prefix}-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 /* Dark mode */

@@ -1,5 +1,6 @@
-import type { DiagramNode, BoxNode } from '../types';
+import type { DiagramNode, BoxNode, ArrowNode, TextNode } from '../types';
 import type { Token } from './tokenizer';
+import stringWidth from 'string-width';
 
 /**
  * Analyze tokenized input and extract diagram nodes
@@ -10,12 +11,17 @@ export function analyzeStructure(
 ): DiagramNode[] {
   const nodes: DiagramNode[] = [];
 
-  // Find boxes
+  // Find boxes first
   const boxes = findBoxes(tokens, lines);
   nodes.push(...boxes);
 
-  // TODO: Find arrows
-  // TODO: Find standalone text
+  // Find arrows/connectors
+  const arrows = findArrows(tokens, boxes);
+  nodes.push(...arrows);
+
+  // Find standalone text (not inside boxes)
+  const texts = findStandaloneText(tokens, lines, boxes);
+  nodes.push(...texts);
 
   return nodes;
 }
@@ -127,17 +133,24 @@ function extractBoxText(
   for (let row = startRow + 1; row < endRow; row++) {
     const line = lines[row] || '';
     // Extract characters between the vertical borders
-    // This is a simplified extraction - real implementation needs to handle CJK width
+    // Handle CJK character widths properly
     let text = '';
     let col = 0;
 
     for (const char of line) {
+      const charWidth = stringWidth(char);
+
       if (col > startCol && col < endCol) {
+        // Skip border characters
         if (char !== '│' && char !== '║' && char !== '|') {
           text += char;
         }
       }
-      col++;
+
+      col += charWidth;
+
+      // Stop if we've passed the end column
+      if (col >= endCol) break;
     }
 
     textLines.push(text.trim());
@@ -166,4 +179,270 @@ function detectBoxStyle(
     default:
       return 'single';
   }
+}
+
+/**
+ * Find arrows and connectors between boxes
+ */
+function findArrows(tokens: Token[][], boxes: BoxNode[]): ArrowNode[] {
+  const arrows: ArrowNode[] = [];
+
+  for (let row = 0; row < tokens.length; row++) {
+    const lineTokens = tokens[row];
+    let i = 0;
+
+    while (i < lineTokens.length) {
+      const token = lineTokens[i];
+
+      // Check for arrow patterns
+      if (isArrowToken(token.type)) {
+        // Check if this arrow is inside a box
+        if (!isInsideBox(token.row, token.col, boxes)) {
+          const arrow = parseArrow(lineTokens, i, row);
+          if (arrow) {
+            arrows.push(arrow);
+            // Skip processed tokens
+            i += arrow.width;
+            continue;
+          }
+        }
+      }
+
+      // Check for horizontal line that could be a connector
+      if (token.type === 'box-horizontal' && !isInsideBox(row, token.col, boxes)) {
+        const connector = parseHorizontalConnector(lineTokens, i, row, boxes);
+        if (connector) {
+          arrows.push(connector);
+          i += connector.width;
+          continue;
+        }
+      }
+
+      i++;
+    }
+  }
+
+  return arrows;
+}
+
+/**
+ * Check if a token type is an arrow
+ */
+function isArrowToken(type: string): boolean {
+  return type.startsWith('arrow-');
+}
+
+/**
+ * Check if a position is inside any box
+ */
+function isInsideBox(row: number, col: number, boxes: BoxNode[]): boolean {
+  for (const box of boxes) {
+    if (
+      row >= box.y &&
+      row <= box.y + box.height - 1 &&
+      col >= box.x &&
+      col <= box.x + box.width - 1
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Parse an arrow starting at given position
+ */
+function parseArrow(
+  lineTokens: Token[],
+  startIndex: number,
+  row: number
+): ArrowNode | null {
+  const token = lineTokens[startIndex];
+
+  let direction: ArrowNode['direction'];
+  switch (token.type) {
+    case 'arrow-right':
+      direction = 'right';
+      break;
+    case 'arrow-left':
+      direction = 'left';
+      break;
+    case 'arrow-up':
+      direction = 'up';
+      break;
+    case 'arrow-down':
+      direction = 'down';
+      break;
+    default:
+      return null;
+  }
+
+  // Look for preceding/following line characters
+  let width = 1;
+  let startCol = token.col;
+
+  // Check for preceding horizontal lines (for patterns like ───▶)
+  if (direction === 'right') {
+    let j = startIndex - 1;
+    while (j >= 0 && lineTokens[j].type === 'box-horizontal') {
+      width++;
+      startCol = lineTokens[j].col;
+      j--;
+    }
+  }
+
+  // Check for following horizontal lines (for patterns like ◀───)
+  if (direction === 'left') {
+    let j = startIndex + 1;
+    while (j < lineTokens.length && lineTokens[j].type === 'box-horizontal') {
+      width++;
+      j++;
+    }
+  }
+
+  return {
+    type: 'arrow',
+    x: startCol,
+    y: row,
+    width,
+    height: 1,
+    direction,
+    style: 'solid',
+    headStyle: 'filled',
+  };
+}
+
+/**
+ * Parse a horizontal connector (line between boxes)
+ */
+function parseHorizontalConnector(
+  lineTokens: Token[],
+  startIndex: number,
+  row: number,
+  boxes: BoxNode[]
+): ArrowNode | null {
+  let endIndex = startIndex;
+  let hasArrow = false;
+  let direction: ArrowNode['direction'] = 'right';
+
+  // Follow the horizontal line
+  while (endIndex < lineTokens.length) {
+    const token = lineTokens[endIndex];
+    if (token.type === 'box-horizontal') {
+      endIndex++;
+    } else if (token.type === 'arrow-right') {
+      hasArrow = true;
+      direction = 'right';
+      endIndex++;
+      break;
+    } else if (token.type === 'arrow-left') {
+      hasArrow = true;
+      direction = 'left';
+      endIndex++;
+      break;
+    } else {
+      break;
+    }
+  }
+
+  const width = endIndex - startIndex;
+  if (width < 2) return null; // Too short to be a connector
+
+  const startToken = lineTokens[startIndex];
+
+  return {
+    type: 'arrow',
+    x: startToken.col,
+    y: row,
+    width,
+    height: 1,
+    direction,
+    style: 'solid',
+    headStyle: hasArrow ? 'filled' : 'none',
+  };
+}
+
+/**
+ * Find standalone text (not inside boxes)
+ */
+function findStandaloneText(
+  tokens: Token[][],
+  lines: string[],
+  boxes: BoxNode[]
+): TextNode[] {
+  const texts: TextNode[] = [];
+
+  for (let row = 0; row < tokens.length; row++) {
+    const lineTokens = tokens[row];
+    let textStart = -1;
+    let textChars: string[] = [];
+
+    for (let i = 0; i < lineTokens.length; i++) {
+      const token = lineTokens[i];
+
+      // Skip if inside a box
+      if (isInsideBox(row, token.col, boxes)) {
+        if (textChars.length > 0) {
+          const text = textChars.join('').trim();
+          if (text.length > 0) {
+            texts.push({
+              type: 'text',
+              x: textStart,
+              y: row,
+              width: token.col - textStart,
+              height: 1,
+              text,
+            });
+          }
+          textChars = [];
+          textStart = -1;
+        }
+        continue;
+      }
+
+      // Collect text characters
+      if (token.type === 'text') {
+        if (textStart === -1) {
+          textStart = token.col;
+        }
+        textChars.push(token.char);
+      } else if (token.type === 'space' && textChars.length > 0) {
+        textChars.push(' ');
+      } else {
+        // Non-text token, flush accumulated text
+        if (textChars.length > 0) {
+          const text = textChars.join('').trim();
+          if (text.length > 0) {
+            texts.push({
+              type: 'text',
+              x: textStart,
+              y: row,
+              width: token.col - textStart,
+              height: 1,
+              text,
+            });
+          }
+          textChars = [];
+          textStart = -1;
+        }
+      }
+    }
+
+    // Flush remaining text
+    if (textChars.length > 0) {
+      const text = textChars.join('').trim();
+      if (text.length > 0) {
+        texts.push({
+          type: 'text',
+          x: textStart,
+          y: row,
+          width: text.length,
+          height: 1,
+          text,
+        });
+      }
+    }
+  }
+
+  return texts;
 }
