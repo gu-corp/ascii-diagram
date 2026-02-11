@@ -27,12 +27,31 @@ export interface BaseNode {
 }
 
 /**
- * Box node (rectangle with optional text)
+ * Box node (simple rectangle with text)
  */
 export interface BoxNode extends BaseNode {
   type: 'box';
   text: string;
   style: 'single' | 'double' | 'ascii' | 'rounded';
+}
+
+/**
+ * Container node (nested box with optional header)
+ */
+export interface ContainerNode extends BaseNode {
+  type: 'container';
+  header?: string;
+  children: DiagramNode[];
+  style: 'single' | 'double' | 'ascii';
+}
+
+/**
+ * Flow node (vertical or horizontal flow of elements)
+ */
+export interface FlowNode extends BaseNode {
+  type: 'flow';
+  direction: 'vertical' | 'horizontal';
+  children: DiagramNode[];
 }
 
 /**
@@ -43,6 +62,7 @@ export interface ArrowNode extends BaseNode {
   direction: 'left' | 'right' | 'up' | 'down';
   style: 'solid' | 'dashed';
   headStyle: 'filled' | 'open' | 'none';
+  label?: string;  // annotation text next to arrow
 }
 
 /**
@@ -63,9 +83,44 @@ export interface LineNode extends BaseNode {
 }
 
 /**
+ * List node (bulleted list)
+ */
+export interface ListNode extends BaseNode {
+  type: 'list';
+  items: string[];
+}
+
+/**
+ * Section node (titled section with content)
+ */
+export interface SectionNode extends BaseNode {
+  type: 'section';
+  title: string;
+  content: DiagramNode[];
+}
+
+/**
  * Union type for all diagram nodes
  */
-export type DiagramNode = BoxNode | ArrowNode | TextNode | LineNode;
+export type DiagramNode =
+  | BoxNode
+  | ContainerNode
+  | FlowNode
+  | ArrowNode
+  | TextNode
+  | LineNode
+  | ListNode
+  | SectionNode;
+
+/**
+ * Bounding rectangle
+ */
+export interface Rect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 
 /**
  * Parsed diagram structure

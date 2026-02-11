@@ -7,9 +7,9 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.js"
     }
   },
   "files": [
@@ -28,8 +28,12 @@
   },
   "devDependencies": {
     "@types/mdast": "^4.0.0",
+    "rehype-stringify": "^10.0.0",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.0.0",
     "tsup": "^8.0.0",
     "typescript": "^5.4.0",
+    "unified": "^11.0.0",
     "vitest": "^1.6.0"
   },
   "peerDependencies": {
@@ -47,5 +51,8 @@
     "type": "git",
     "url": "git+https://github.com/gu-corp/ascii-diagram.git",
     "directory": "packages/remark-plugin"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   }
 }

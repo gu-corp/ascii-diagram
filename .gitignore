@@ -31,3 +31,10 @@ pnpm-debug.log*
 
 # Test coverage
 coverage/
+
+# Test results
+test-results/
+playwright-report/
+
+# Generated demo files
+demo-*.html

@@ -1,0 +1,43 @@
+# ASCII Diagram for Nextra
+
+This example demonstrates how to use `@gu-corp/remark-ascii-diagram` with Nextra.
+
+## Setup
+
+1. Install the packages:
+
+```bash
+npm install @gu-corp/ascii-diagram @gu-corp/remark-ascii-diagram
+```
+
+2. Configure `next.config.mjs`:
+
+```javascript
+import nextra from 'nextra';
+import remarkAsciiDiagram from '@gu-corp/remark-ascii-diagram';
+
+const withNextra = nextra({
+  mdxOptions: {
+    remarkPlugins: [remarkAsciiDiagram],
+  },
+});
+```
+
+3. Add CSS to your `_app.tsx` or global styles:
+
+```typescript
+import { generateSimpleCSS } from '@gu-corp/ascii-diagram';
+
+// Add this CSS to your app
+const css = generateSimpleCSS();
+```
+
+## Quick Example
+
+```ascii
+┌─────────────┐
+│   Hello!    │
+└─────────────┘
+```
+
+See the [Demo](/demo) page for more examples.

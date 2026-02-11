@@ -1,4 +1,15 @@
-import type { Diagram, DiagramNode, BoxNode, ArrowNode, TextNode, AsciiDiagramOptions } from '../types';
+import type {
+  Diagram,
+  DiagramNode,
+  BoxNode,
+  ContainerNode,
+  FlowNode,
+  ArrowNode,
+  TextNode,
+  ListNode,
+  SectionNode,
+  AsciiDiagramOptions,
+} from '../types';
 import { parse } from '../parser';
 import { generateCSS, getDefaultCSS } from './css';
 
@@ -16,63 +27,9 @@ export function render(diagram: Diagram, options?: AsciiDiagramOptions): string 
   const opts = { ...DEFAULT_OPTIONS, ...options };
   const prefix = opts.classPrefix;
 
-  // Sort nodes by position (top to bottom, left to right)
-  const sortedNodes = [...diagram.nodes].sort((a, b) => {
-    if (a.y !== b.y) return a.y - b.y;
-    return a.x - b.x;
-  });
+  const nodeHtml = diagram.nodes.map((node) => renderNode(node, opts)).join('\n');
 
-  // Group nodes by row for layout
-  const rows = groupNodesByRow(sortedNodes);
-  const rowHtml = rows.map((row) => renderRow(row, opts)).join('\n');
-
-  return `<div class="${prefix}-diagram">\n${rowHtml}\n</div>`;
-}
-
-/**
- * Group nodes into rows based on vertical position
- */
-function groupNodesByRow(nodes: DiagramNode[]): DiagramNode[][] {
-  const rows: DiagramNode[][] = [];
-  let currentRow: DiagramNode[] = [];
-  let currentY = -1;
-
-  for (const node of nodes) {
-    // Check if this node overlaps with current row vertically
-    if (currentY === -1 || Math.abs(node.y - currentY) <= 1) {
-      currentRow.push(node);
-      if (currentY === -1) currentY = node.y;
-    } else {
-      if (currentRow.length > 0) {
-        // Sort row by x position before adding
-        currentRow.sort((a, b) => a.x - b.x);
-        rows.push(currentRow);
-      }
-      currentRow = [node];
-      currentY = node.y;
-    }
-  }
-
-  if (currentRow.length > 0) {
-    // Sort final row by x position
-    currentRow.sort((a, b) => a.x - b.x);
-    rows.push(currentRow);
-  }
-
-  return rows;
-}
-
-/**
- * Render a row of nodes
- */
-function renderRow(nodes: DiagramNode[], opts: Required<AsciiDiagramOptions>): string {
-  const prefix = opts.classPrefix;
-
-  if (nodes.length === 0) return '';
-
-  const nodeHtml = nodes.map((node) => renderNode(node, opts)).join('\n');
-
-  return `  <div class="${prefix}-row">\n${nodeHtml}\n  </div>`;
+  return `<div class="${prefix}-diagram">\n${nodeHtml}\n</div>`;
 }
 
 /**
@@ -92,10 +49,18 @@ function renderNode(node: DiagramNode, opts: Required<AsciiDiagramOptions>): str
   switch (node.type) {
     case 'box':
       return renderBox(node, prefix);
+    case 'container':
+      return renderContainer(node, opts);
+    case 'flow':
+      return renderFlow(node, opts);
     case 'arrow':
-      return `<div class="${prefix}-arrow ${prefix}-arrow-${node.direction}"></div>`;
+      return renderArrow(node, prefix);
     case 'text':
-      return `<span class="${prefix}-text">${escapeHtml(node.text)}</span>`;
+      return renderText(node, prefix);
+    case 'list':
+      return renderList(node, prefix);
+    case 'section':
+      return renderSection(node, opts);
     case 'line':
       return `<div class="${prefix}-line ${prefix}-line-${node.direction}"></div>`;
     default:
@@ -104,13 +69,163 @@ function renderNode(node: DiagramNode, opts: Required<AsciiDiagramOptions>): str
 }
 
 /**
- * Render a box node to HTML
+ * Render a simple box
  */
 function renderBox(box: BoxNode, prefix: string): string {
   const styleClass = `${prefix}-box-${box.style}`;
   const content = escapeHtml(box.text);
 
-  return `  <div class="${prefix}-box ${styleClass}">${content}</div>`;
+  return `<div class="${prefix}-box ${styleClass}">${formatContent(content)}</div>`;
+}
+
+/**
+ * Render a container with optional header
+ */
+function renderContainer(container: ContainerNode, opts: Required<AsciiDiagramOptions>): string {
+  const prefix = opts.classPrefix;
+  const styleClass = `${prefix}-container-${container.style}`;
+
+  let html = `<div class="${prefix}-container ${styleClass}">`;
+
+  // Header
+  if (container.header) {
+    html += `\n  <div class="${prefix}-container-header">${escapeHtml(container.header)}</div>`;
+  }
+
+  // Body with children
+  html += `\n  <div class="${prefix}-container-body">`;
+
+  // Render children
+  for (const child of container.children) {
+    html += '\n    ' + renderNode(child, opts);
+  }
+
+  html += `\n  </div>`;
+  html += `\n</div>`;
+
+  return html;
+}
+
+/**
+ * Render a flow (vertical or horizontal sequence)
+ */
+function renderFlow(flow: FlowNode, opts: Required<AsciiDiagramOptions>): string {
+  const prefix = opts.classPrefix;
+  const dirClass = `${prefix}-flow-${flow.direction}`;
+
+  let html = `<div class="${prefix}-flow ${dirClass}">`;
+
+  for (const child of flow.children) {
+    html += '\n  ' + renderNode(child, opts);
+  }
+
+  html += '\n</div>';
+
+  return html;
+}
+
+/**
+ * Render an arrow
+ */
+function renderArrow(arrow: ArrowNode, prefix: string): string {
+  const dirClass = `${prefix}-arrow-${arrow.direction}`;
+
+  if (arrow.label) {
+    return `<div class="${prefix}-arrow-with-label">
+  <div class="${prefix}-arrow ${dirClass}"></div>
+  <span class="${prefix}-arrow-label">${escapeHtml(arrow.label)}</span>
+</div>`;
+  }
+
+  return `<div class="${prefix}-arrow ${dirClass}"></div>`;
+}
+
+/**
+ * Render text
+ */
+function renderText(text: TextNode, prefix: string): string {
+  const content = escapeHtml(text.text);
+
+  // Check if it's a label (short text, often a title)
+  if (text.text.length < 30 && !text.text.includes('\n')) {
+    return `<span class="${prefix}-label">${content}</span>`;
+  }
+
+  return `<div class="${prefix}-text">${formatContent(content)}</div>`;
+}
+
+/**
+ * Render a list
+ */
+function renderList(list: ListNode, prefix: string): string {
+  const items = list.items
+    .map((item) => `<li>${escapeHtml(item)}</li>`)
+    .join('\n    ');
+
+  return `<ul class="${prefix}-list">\n    ${items}\n  </ul>`;
+}
+
+/**
+ * Render a section with title
+ */
+function renderSection(section: SectionNode, opts: Required<AsciiDiagramOptions>): string {
+  const prefix = opts.classPrefix;
+
+  let html = `<div class="${prefix}-section">`;
+  html += `\n  <div class="${prefix}-section-title">${escapeHtml(section.title)}</div>`;
+  html += `\n  <div class="${prefix}-section-content">`;
+
+  for (const child of section.content) {
+    html += '\n    ' + renderNode(child, opts);
+  }
+
+  html += '\n  </div>';
+  html += '\n</div>';
+
+  return html;
+}
+
+/**
+ * Format content text (handle bullet points, sections, etc.)
+ */
+function formatContent(text: string): string {
+  const lines = text.split('\n');
+  const result: string[] = [];
+  let inList = false;
+  let listItems: string[] = [];
+
+  for (const line of lines) {
+    // Check for bullet point
+    if (line.match(/^[・\-\*]\s*/)) {
+      if (!inList) {
+        inList = true;
+        listItems = [];
+      }
+      listItems.push(line.replace(/^[・\-\*]\s*/, ''));
+    } else {
+      // Flush list if we were in one
+      if (inList) {
+        result.push('<ul>' + listItems.map(i => `<li>${i}</li>`).join('') + '</ul>');
+        inList = false;
+        listItems = [];
+      }
+
+      // Check for section header【】
+      const sectionMatch = line.match(/^【(.+?)】$/);
+      if (sectionMatch) {
+        result.push(`<strong>${sectionMatch[1]}</strong>`);
+      } else if (line.trim()) {
+        result.push(`<p>${line}</p>`);
+      }
+    }
+  }
+
+  // Flush any remaining list
+  if (inList) {
+    result.push('<ul>' + listItems.map(i => `<li>${i}</li>`).join('') + '</ul>');
+  }
+
+  return result.join('\n');
 }
 
 /**
