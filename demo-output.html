@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>ASCII Diagram Demo</title>
+  <style>
+.ascii-diagram {
+  --ascii-border-color: #374151;
+  --ascii-bg-color: #ffffff;
+  --ascii-text-color: #1f2937;
+  --ascii-border-radius: 4px;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  font-family: ui-monospace, monospace;
+}
+
+/* Dark mode */
+.dark .ascii-diagram,
+[data-theme="dark"] .ascii-diagram {
+  --ascii-border-color: #9ca3af;
+  --ascii-bg-color: #1f2937;
+  --ascii-text-color: #f3f4f6;
+}
+
+/* Box styles */
+.ascii-box {
+  border: 2px solid var(--ascii-border-color);
+  border-radius: var(--ascii-border-radius);
+  padding: 0.5rem 1rem;
+  background-color: var(--ascii-bg-color);
+  color: var(--ascii-text-color);
+  white-space: pre-wrap;
+}
+
+.ascii-box-single {
+  border-style: solid;
+}
+
+.ascii-box-double {
+  border-width: 3px;
+  border-style: double;
+}
+
+.ascii-box-ascii {
+  border-radius: 0;
+}
+
+.ascii-box-rounded {
+  border-radius: 12px;
+}
+
+/* Arrow styles */
+.ascii-arrow {
+  display: flex;
+  align-items: center;
+  color: var(--ascii-border-color);
+  font-size: 1.25rem;
+}
+
+.ascii-arrow-right::after {
+  content: '→';
+}
+
+.ascii-arrow-left::after {
+  content: '←';
+}
+
+.ascii-arrow-up::after {
+  content: '↑';
+}
+
+.ascii-arrow-down::after {
+  content: '↓';
+}
+
+/* Line styles */
+.ascii-line {
+  background-color: var(--ascii-border-color);
+}
+
+.ascii-line-horizontal {
+  height: 2px;
+  min-width: 2rem;
+}
+
+.ascii-line-vertical {
+  width: 2px;
+  min-height: 2rem;
+}
+
+/* Text styles */
+.ascii-text {
+  color: var(--ascii-text-color);
+}
+  </style>
+</head>
+<body>
+  <h1>ASCII Diagram Demo</h1>
+
+  <h2>Rendered Output:</h2>
+  <div class="ascii-diagram">
+  <div class="ascii-box ascii-box-single">G.U.Exchange（電子決済取引業者）
+【ライセンス】
+・電子決済取引業
+・暗号資産交換業
+【業務】
+・ユーザー口座管理（KYC/AML）
+・ステーブルコインの売買</div>
+</div>
+
+  <h2>Original ASCII:</h2>
+  <pre>
+┌─────────────────────────────────────────────────────┐
+│         電子決済取引業者（G.U.Exchange）の役割        │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│  一般ユーザー                                        │
+│      │                                              │
+│      │ 口座開設、チャージ、換金、送金                 │
+│      ▼                                              │
+│  ┌─────────────────────────────────────────────┐   │
+│  │     G.U.Exchange（電子決済取引業者）          │   │
+│  │                                             │   │
+│  │  【ライセンス】                              │   │
+│  │  ・電子決済取引業                            │   │
+│  │  ・暗号資産交換業                            │   │
+│  │                                             │   │
+│  │  【業務】                                    │   │
+│  │  ・ユーザー口座管理（KYC/AML）               │   │
+│  │  ・ステーブルコインの売買                    │   │
+│  └─────────────────────────────────────────────┘   │
+│      │                                              │
+│      │ 発行申請、償還申請                           │
+│      ▼                                              │
+│  信託会社（受託者）                                  │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+</pre>
+</body>
+</html>
