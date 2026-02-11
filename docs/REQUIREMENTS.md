@@ -1,106 +1,108 @@
-# ascii-diagram 要件定義書
+# ascii-diagram Requirements Specification
 
-**バージョン**: 0.1.0
-**更新日**: 2026-02-11
-**ステータス**: Draft
-**リポジトリ**: `gu-corp/ascii-diagram`
+**Version**: 0.1.0
+**Updated**: 2026-02-11
+**Status**: Draft
+**Repository**: `gu-corp/ascii-diagram`
+
+[日本語版はこちら](./REQUIREMENTS.ja.md)
 
 ---
 
-## 1. 概要
+## 1. Overview
 
-### 1.1 目的
+### 1.1 Purpose
 
-Markdown内のASCIIアート図をHTML/CSSに自動変換し、きれいな図として表示するツール。Mermaidと同様の開発者体験を提供する。
+A tool that automatically converts ASCII art diagrams in Markdown to HTML/CSS, rendering them as beautiful diagrams. Provides a developer experience similar to Mermaid.
 
-### 1.2 背景
+### 1.2 Background
 
-- 技術ドキュメントでASCIIアートの図が多用されている
-- 既存ツール（svgbob等）は日本語対応が弱い
-- Mermaidは記法の学習コストがある
-- ASCIIアートはテキストエディタで直感的に編集可能
+- ASCII art diagrams are widely used in technical documentation
+- Existing tools (svgbob, etc.) have weak Japanese support
+- Mermaid has a learning curve for its syntax
+- ASCII art can be intuitively edited in any text editor
 
-### 1.3 ゴール
+### 1.3 Goal
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│  Markdownソース        →        レンダリング結果          │
+│  Markdown Source        →        Rendered Result          │
 │                                                          │
 │  ```ascii                       ┌─────────┐              │
-│  ┌─────────┐                    │ ユーザー │              │
-│  │ ユーザー │                    └─────────┘              │
-│  └─────────┘                    (きれいなHTML/CSS)        │
+│  ┌─────────┐                    │  User   │              │
+│  │  User   │                    └─────────┘              │
+│  └─────────┘                    (Beautiful HTML/CSS)     │
 │  ```                                                     │
 └──────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 2. ターゲットユーザー
+## 2. Target Users
 
-| ユーザー | ニーズ |
-|---------|--------|
-| テクニカルライター | ドキュメントに図を入れたい |
-| エンジニア | 仕様書・設計書の作成 |
-| プロダクトマネージャー | 業務フロー図の作成 |
+| User | Needs |
+|------|-------|
+| Technical Writers | Add diagrams to documentation |
+| Engineers | Create specifications and design documents |
+| Product Managers | Create business flow diagrams |
 
-### 2.1 ユーザーストーリー
+### 2.1 User Stories
 
-1. **US-01**: ユーザーとして、Markdown内にASCIIで書いた図を、そのままきれいな図として表示したい
-2. **US-02**: ユーザーとして、日本語を含む図を正しく表示したい
-3. **US-03**: ユーザーとして、Mermaidと同じように```ascii```ブロックで図を書きたい
-4. **US-04**: ユーザーとして、ダークモード対応した図を表示したい
-5. **US-05**: ユーザーとして、図内のテキストを選択・コピーしたい
+1. **US-01**: As a user, I want ASCII diagrams in Markdown to render as beautiful diagrams
+2. **US-02**: As a user, I want diagrams containing Japanese to display correctly
+3. **US-03**: As a user, I want to write diagrams in ```ascii``` blocks like Mermaid
+4. **US-04**: As a user, I want diagrams that support dark mode
+5. **US-05**: As a user, I want to select and copy text within diagrams
 
 ---
 
-## 3. 機能要件
+## 3. Functional Requirements
 
-### 3.1 対応図形
+### 3.1 Supported Shapes
 
-#### Phase 1（MVP）
+#### Phase 1 (MVP)
 
-| 図形 | ASCII表現 | 優先度 |
-|------|-----------|:------:|
-| ボックス（角） | `┌ ┐ └ ┘` | 高 |
-| ボックス（線） | `─ │` | 高 |
-| ボックス（ASCII） | `+ - \|` | 高 |
-| 矢印（横） | `→ ← ─▶ ◀─ -->` | 高 |
-| テキスト | 任意の文字列 | 高 |
+| Shape | ASCII Representation | Priority |
+|-------|---------------------|:--------:|
+| Box (corners) | `┌ ┐ └ ┘` | High |
+| Box (lines) | `─ │` | High |
+| Box (ASCII) | `+ - \|` | High |
+| Arrow (horizontal) | `→ ← ─▶ ◀─ -->` | High |
+| Text | Any string | High |
 
 #### Phase 2
 
-| 図形 | ASCII表現 | 優先度 |
-|------|-----------|:------:|
-| 矢印（縦） | `↑ ↓ ▲ ▼` | 中 |
-| 分岐 | `├ ┤ ┬ ┴ ┼` | 中 |
-| 二重線 | `═ ║ ╔ ╗ ╚ ╝` | 中 |
-| 角丸ボックス | `╭ ╮ ╯ ╰` | 中 |
+| Shape | ASCII Representation | Priority |
+|-------|---------------------|:--------:|
+| Arrow (vertical) | `↑ ↓ ▲ ▼` | Medium |
+| Junctions | `├ ┤ ┬ ┴ ┼` | Medium |
+| Double lines | `═ ║ ╔ ╗ ╚ ╝` | Medium |
+| Rounded box | `╭ ╮ ╯ ╰` | Medium |
 
 #### Phase 3
 
-| 図形 | ASCII表現 | 優先度 |
-|------|-----------|:------:|
-| 斜め線 | `/ \` | 低 |
-| 点線 | `┄ ┆ ╌ ╎` | 低 |
-| 網掛け | `░ ▒ ▓` | 低 |
+| Shape | ASCII Representation | Priority |
+|-------|---------------------|:--------:|
+| Diagonal lines | `/ \` | Low |
+| Dashed lines | `┄ ┆ ╌ ╎` | Low |
+| Shading | `░ ▒ ▓` | Low |
 
-### 3.2 入力形式
+### 3.2 Input Format
 
 ````markdown
 ```ascii
 ┌─────────────┐     ┌─────────────┐
-│   ユーザー   │────▶│   Exchange  │
+│    User     │────▶│   Exchange  │
 └─────────────┘     └─────────────┘
 ```
 ````
 
-### 3.3 出力形式
+### 3.3 Output Format
 
 ```html
 <div class="ascii-diagram">
   <div class="ascii-row">
-    <div class="ascii-box">ユーザー</div>
+    <div class="ascii-box">User</div>
     <div class="ascii-connector">
       <div class="ascii-line"></div>
       <div class="ascii-arrow">▶</div>
@@ -110,17 +112,17 @@ Markdown内のASCIIアート図をHTML/CSSに自動変換し、きれいな図�
 </div>
 ```
 
-### 3.4 スタイリング
+### 3.4 Styling
 
 ```css
-/* デフォルトテーマ */
+/* Default theme */
 .ascii-diagram {
   --ascii-border-color: #333;
   --ascii-bg-color: #fff;
   --ascii-text-color: #333;
 }
 
-/* ダークモード */
+/* Dark mode */
 .dark .ascii-diagram {
   --ascii-border-color: #ccc;
   --ascii-bg-color: #1a1a1a;
@@ -130,94 +132,94 @@ Markdown内のASCIIアート図をHTML/CSSに自動変換し、きれいな図�
 
 ---
 
-## 4. 非機能要件
+## 4. Non-Functional Requirements
 
-### 4.1 パフォーマンス
+### 4.1 Performance
 
-| 項目 | 要件 |
-|------|------|
-| 変換速度 | 100行以下のASCII図を50ms以内に変換 |
-| バンドルサイズ | core パッケージ 20KB以下（gzip） |
+| Item | Requirement |
+|------|-------------|
+| Conversion speed | Convert ASCII diagrams under 100 lines within 50ms |
+| Bundle size | Core package under 20KB (gzip) |
 
-### 4.2 互換性
+### 4.2 Compatibility
 
-| 項目 | 要件 |
-|------|------|
-| Node.js | 18.x 以上 |
-| ブラウザ | Chrome/Firefox/Safari/Edge 最新2バージョン |
-| フレームワーク | Nextra, Docusaurus, VitePress, Astro |
+| Item | Requirement |
+|------|-------------|
+| Node.js | 18.x or higher |
+| Browsers | Latest 2 versions of Chrome/Firefox/Safari/Edge |
+| Frameworks | Nextra, Docusaurus, VitePress, Astro |
 
-### 4.3 多言語対応
+### 4.3 Internationalization
 
-| 項目 | 要件 |
-|------|------|
-| 日本語 | 全角文字の幅を正しく計算 |
-| CJK | 中国語・韓国語も対応 |
-| RTL | 将来対応（Phase 3以降） |
+| Item | Requirement |
+|------|-------------|
+| Japanese | Correct width calculation for full-width characters |
+| CJK | Support for Chinese and Korean |
+| RTL | Future support (Phase 3+) |
 
-### 4.4 アクセシビリティ
+### 4.4 Accessibility
 
-| 項目 | 要件 |
-|------|------|
-| テキスト | 選択・コピー可能 |
-| スクリーンリーダー | 適切なaria-label |
-| キーボード | フォーカス対応 |
-
----
-
-## 5. 技術スタック
-
-### 5.1 言語・ランタイム
-
-| 項目 | 選定 | 理由 |
-|------|------|------|
-| 言語 | TypeScript | エコシステム、型安全 |
-| ランタイム | Node.js 18+ | LTS |
-| パッケージ管理 | pnpm | 高速、ワークスペース対応 |
-
-### 5.2 依存ライブラリ
-
-| ライブラリ | 用途 |
-|-----------|------|
-| `string-width` | 全角文字幅計算 |
-| `unified` | Markdown処理基盤 |
-| `unist-util-visit` | AST走査 |
-
-### 5.3 開発ツール
-
-| ツール | 用途 |
-|--------|------|
-| Vitest | テスト |
-| tsup | ビルド |
-| Turborepo | モノレポ管理 |
-| Changesets | バージョン管理 |
+| Item | Requirement |
+|------|-------------|
+| Text | Selectable and copyable |
+| Screen readers | Appropriate aria-labels |
+| Keyboard | Focus support |
 
 ---
 
-## 6. パッケージ構成
+## 5. Technology Stack
+
+### 5.1 Languages & Runtime
+
+| Item | Choice | Reason |
+|------|--------|--------|
+| Language | TypeScript | Ecosystem, type safety |
+| Runtime | Node.js 18+ | LTS |
+| Package manager | pnpm | Fast, workspace support |
+
+### 5.2 Dependencies
+
+| Library | Purpose |
+|---------|---------|
+| `string-width` | Full-width character width calculation |
+| `unified` | Markdown processing foundation |
+| `unist-util-visit` | AST traversal |
+
+### 5.3 Development Tools
+
+| Tool | Purpose |
+|------|---------|
+| Vitest | Testing |
+| tsup | Build |
+| Turborepo | Monorepo management |
+| Changesets | Version management |
+
+---
+
+## 6. Package Structure
 
 ```
 ascii-diagram/
 ├── packages/
-│   ├── core/                 # コアライブラリ
+│   ├── core/                 # Core library
 │   │   ├── src/
-│   │   │   ├── parser/       # ASCIIパーサー
+│   │   │   ├── parser/       # ASCII parser
 │   │   │   │   ├── tokenizer.ts
 │   │   │   │   ├── analyzer.ts
 │   │   │   │   └── unicode.ts
-│   │   │   ├── renderer/     # HTML生成
+│   │   │   ├── renderer/     # HTML generation
 │   │   │   │   ├── html.ts
 │   │   │   │   └── css.ts
 │   │   │   └── index.ts
 │   │   ├── package.json
 │   │   └── tsconfig.json
 │   │
-│   ├── remark-plugin/        # remarkプラグイン
+│   ├── remark-plugin/        # Remark plugin
 │   │   ├── src/
 │   │   │   └── index.ts
 │   │   └── package.json
 │   │
-│   └── demo/                 # デモサイト
+│   └── demo/                 # Demo site
 │       ├── src/
 │       └── package.json
 │
@@ -228,24 +230,24 @@ ascii-diagram/
 
 ---
 
-## 7. API設計
+## 7. API Design
 
 ### 7.1 Core API
 
 ```typescript
 import { parse, render } from '@gu-corp/ascii-diagram';
 
-// ASCIIをパースしてASTを取得
+// Parse ASCII to get AST
 const ast = parse(`
 ┌─────────┐
 │  Hello  │
 └─────────┘
 `);
 
-// ASTをHTMLに変換
+// Convert AST to HTML
 const html = render(ast);
 
-// 一括変換
+// One-step conversion
 const html = asciiToHtml(asciiString, options);
 ```
 
@@ -266,73 +268,73 @@ const withNextra = nextra({
 
 ```typescript
 interface AsciiDiagramOptions {
-  // テーマ
+  // Theme
   theme?: 'light' | 'dark' | 'auto';
 
-  // CSSクラスプレフィックス
+  // CSS class prefix
   classPrefix?: string;
 
-  // インラインスタイル出力
+  // Inline style output
   inlineStyles?: boolean;
 
-  // フォント設定
+  // Font settings
   fontFamily?: string;
 }
 ```
 
 ---
 
-## 8. マイルストーン
+## 8. Milestones
 
-### Phase 1: MVP（2週間）
+### Phase 1: MVP (2 weeks)
 
-- [ ] プロジェクトセットアップ（モノレポ構成）
-- [ ] 基本パーサー（ボックス認識）
-- [ ] HTMLレンダラー（基本形）
-- [ ] 日本語対応（全角幅計算）
-- [ ] remarkプラグイン
-- [ ] デモサイト
+- [x] Project setup (monorepo structure)
+- [x] Basic parser (box recognition)
+- [x] HTML renderer (basic form)
+- [x] Japanese support (full-width width calculation)
+- [x] Remark plugin
+- [ ] Demo site
 
-### Phase 2: 機能拡充（2週間）
+### Phase 2: Feature Expansion (2 weeks)
 
-- [ ] 矢印・コネクター対応
-- [ ] 分岐対応
-- [ ] ダークモード
-- [ ] テーマカスタマイズ
-- [ ] Docusaurusプラグイン
+- [x] Arrow/connector support
+- [x] Junction support
+- [x] Dark mode
+- [ ] Theme customization
+- [ ] Docusaurus plugin
 
-### Phase 3: 高度な機能（将来）
+### Phase 3: Advanced Features (Future)
 
-- [ ] 斜め線対応
-- [ ] SVG出力オプション
-- [ ] AI補助（曖昧なパターン認識）
-- [ ] エディタ拡張（VS Code）
+- [ ] Diagonal line support
+- [ ] SVG output option
+- [ ] AI assistance (ambiguous pattern recognition)
+- [ ] Editor extension (VS Code)
 
 ---
 
-## 9. 競合分析
+## 9. Competitive Analysis
 
-| ツール | 日本語 | HTML出力 | remark対応 | 保守状況 |
-|--------|:------:|:--------:|:----------:|:--------:|
-| svgbob | ✗ | ✗ (SVG) | △ | 活発 |
-| asciidoctor-diagram | △ | ✗ | ✗ | 活発 |
-| ditaa | △ | ✗ (PNG) | ✗ | 停滞 |
+| Tool | Japanese | HTML Output | Remark Support | Maintenance |
+|------|:--------:|:-----------:|:--------------:|:-----------:|
+| svgbob | ✗ | ✗ (SVG) | △ | Active |
+| asciidoctor-diagram | △ | ✗ | ✗ | Active |
+| ditaa | △ | ✗ (PNG) | ✗ | Stagnant |
 | **ascii-diagram** | ◎ | ◎ | ◎ | - |
 
 ---
 
-## 10. 成功指標
+## 10. Success Metrics
 
-| 指標 | 目標 |
-|------|------|
-| npm ダウンロード | 1,000/月（6ヶ月後） |
-| GitHub スター | 100（6ヶ月後） |
-| ドキュメントサイト導入 | 5サイト |
+| Metric | Target |
+|--------|--------|
+| npm downloads | 1,000/month (after 6 months) |
+| GitHub stars | 100 (after 6 months) |
+| Documentation site adoption | 5 sites |
 
 ---
 
-## 変更履歴
+## Changelog
 
-| バージョン | 日付 | 変更内容 | 作成者 |
-|-----------|------|---------|--------|
-| 0.1.0 | 2026-02-11 | 初版作成 | - |
+| Version | Date | Changes | Author |
+|---------|------|---------|--------|
+| 0.1.0 | 2026-02-11 | Initial version | - |
