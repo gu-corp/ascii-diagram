@@ -1,102 +1,104 @@
-# ASCII Diagram 作成ガイド（AI向け）
+# ASCII Diagram Creation Guide (for AI)
 
-このガイドは、`ascii-diagram` ライブラリで正しく変換されるASCIIダイアグラムを作成するためのルールです。
+This guide describes the rules for creating ASCII diagrams that render correctly with the `ascii-diagram` library.
 
-## 基本ルール
+[日本語版はこちら](./ASCII_DIAGRAM_GUIDE.ja.md)
 
-### 1. 文字幅の計算
+## Basic Rules
 
-| 文字種別 | 幅 | 例 |
-|---------|----|----|
-| 半角英数・記号 | 1 | `A`, `1`, `-`, `│` |
-| 全角日本語・記号 | 2 | `あ`, `漢`, `（`, `）` |
-| 罫線文字 | 1 | `┌`, `─`, `┐`, `│`, `└`, `┘` |
-| 矢印 | 1 | `→`, `←`, `↑`, `↓`, `▼`, `▲` |
+### 1. Character Width Calculation
 
-### 2. 行幅の統一（重要）
+| Character Type | Width | Examples |
+|---------------|-------|----------|
+| Half-width alphanumeric/symbols | 1 | `A`, `1`, `-`, `│` |
+| Full-width Japanese/symbols | 2 | `あ`, `漢`, `（`, `）` |
+| Box drawing characters | 1 | `┌`, `─`, `┐`, `│`, `└`, `┘` |
+| Arrows | 1 | `→`, `←`, `↑`, `↓`, `▼`, `▲` |
 
-**すべての行は同じ幅（カラム数）にする必要があります。**
+### 2. Consistent Line Width (Important)
+
+**All lines must have the same width (column count).**
 
 ```
-良い例（全行 width=20）:
+Good example (all lines width=20):
 ┌──────────────────┐
-│  テスト          │
+│  Test            │
 └──────────────────┘
 
-悪い例（行ごとに幅が違う）:
+Bad example (different widths per line):
 ┌──────────────────┐
-│  テスト│
+│  Test│
 └──────────────────┘
 ```
 
-### 3. 使用可能な罫線文字
+### 3. Available Box Drawing Characters
 
 ```
-角:     ┌ ┐ └ ┘
-線:     ─ │
-T字:    ├ ┤ ┬ ┴
-交差:   ┼
-二重線: ═ ║ ╔ ╗ ╚ ╝ ╠ ╣ ╦ ╩ ╬
+Corners:    ┌ ┐ └ ┘
+Lines:      ─ │
+T-junctions: ├ ┤ ┬ ┴
+Cross:      ┼
+Double-line: ═ ║ ╔ ╗ ╚ ╝ ╠ ╣ ╦ ╩ ╬
 ```
 
-### 4. 矢印文字
+### 4. Arrow Characters
 
 ```
-方向矢印: → ← ↑ ↓
-三角矢印: ▶ ◀ ▲ ▼
+Directional arrows: → ← ↑ ↓
+Triangle arrows:    ▶ ◀ ▲ ▼
 ```
 
-矢印は緑色でレンダリングされます。
+Arrows are rendered in green.
 
-## 図の構造パターン
+## Diagram Structure Patterns
 
-### シンプルなボックス
+### Simple Box
 
 ```
 ┌─────────┐
-│  内容   │
+│ Content │
 └─────────┘
 ```
 
-### ヘッダー付きボックス
+### Box with Header
 
 ```
 ┌─────────────────┐
-│    タイトル     │
+│     Title       │
 ├─────────────────┤
-│  本文内容       │
+│  Body content   │
 └─────────────────┘
 ```
 
-### ネストしたボックス
+### Nested Boxes
 
 ```
 ┌─────────────────────┐
-│  外側              │
+│  Outer             │
 │  ┌───────────┐     │
-│  │  内側     │     │
+│  │  Inner    │     │
 │  └───────────┘     │
 └─────────────────────┘
 ```
 
-### フローチャート（縦方向）
+### Vertical Flowchart
 
 ```
 ┌─────────┐
-│ステップ1│
+│ Step 1  │
 └────┬────┘
      │
      ▼
 ┌─────────┐
-│ステップ2│
+│ Step 2  │
 └─────────┘
 ```
 
-### 分岐フロー
+### Branching Flow
 
 ```
          ┌─────────┐
-         │  判定   │
+         │  Check  │
          └────┬────┘
               │
      ┌────────┼────────┐
@@ -106,71 +108,70 @@ T字:    ├ ┤ ┬ ┴
 └────────┘   │   └────────┘
 ```
 
-## 幅計算のヒント
+## Width Calculation Tips
 
-### 計算例
+### Calculation Example
 
 ```
-│  G.U.Exchange（電子決済）  │
+│  G.U.Exchange (Payment)  │
 ```
 
-内訳:
+Breakdown:
 - `│` = 1
-- 空白2つ = 2
-- `G.U.Exchange` = 12（半角12文字）
-- `（` = 2（全角）
-- `電子決済` = 8（全角4文字×2）
-- `）` = 2（全角）
-- 空白2つ = 2
+- 2 spaces = 2
+- `G.U.Exchange` = 12 (12 half-width characters)
+- ` ` = 1 (space)
+- `(Payment)` = 9 (9 half-width characters)
+- 2 spaces = 2
 - `│` = 1
-- **合計 = 30**
+- **Total = 28**
 
-### 行末のパディング
+### Right Padding
 
-テキストが短い行は、スペースで右端をパディングして幅を揃える:
-
-```
-│  短いテキスト                          │  ← スペースで埋める
-│  長いテキストで埋まっている場合は不要  │
-```
-
-## チェックリスト
-
-図を作成したら以下を確認:
-
-- [ ] すべての行が同じ幅か
-- [ ] ボックスの四隅が正しく閉じているか
-- [ ] 縦線が上下で揃っているか
-- [ ] 全角/半角の幅計算が正しいか
-- [ ] ネストしたボックスの位置が揃っているか
-
-## よくある間違い
-
-### 1. 全角括弧の幅
+Pad shorter text lines with spaces to align the width:
 
 ```
-誤: │ (テスト) │  ← 半角括弧と混同
-正: │（テスト）│  ← 全角括弧は幅2
+│  Short text                           │  ← pad with spaces
+│  Longer text that fills the box      │
 ```
 
-### 2. 行末の縦線位置
+## Checklist
+
+After creating a diagram, verify:
+
+- [ ] All lines have the same width
+- [ ] Box corners are properly closed
+- [ ] Vertical lines align top to bottom
+- [ ] Full-width/half-width width calculation is correct
+- [ ] Nested boxes are properly aligned
+
+## Common Mistakes
+
+### 1. Parentheses Width
 
 ```
-誤:
-│  テキスト│        ← 内側ボックス
-│  テキスト  │      ← 外側ボックス（位置ずれ）
-
-正:
-│  テキスト  │      ← 内側ボックス
-│  テキスト  │      ← 外側ボックス（揃っている）
+Wrong: │ (test) │  ← mixing with half-width parentheses
+Right: │（test）│  ← full-width parentheses have width 2
 ```
 
-### 3. 縦線の連続性
+### 2. Vertical Line Position
 
-縦線は行をまたいで同じカラム位置に配置:
+```
+Wrong:
+│  Text│        ← inner box
+│  Text  │      ← outer box (misaligned)
+
+Right:
+│  Text  │      ← inner box
+│  Text  │      ← outer box (aligned)
+```
+
+### 3. Vertical Line Continuity
+
+Vertical lines must be in the same column position across rows:
 
 ```
 │       │
-│       │  ← 同じカラム位置
+│       │  ← same column position
 │       ▼
 ```
