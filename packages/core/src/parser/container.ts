@@ -100,6 +100,17 @@ export function detectOuterContainer(
     }
   );
 
+  // If this is a simple box (no header, only text children, no nested containers),
+  // return null to let analyzeStructure handle it as a BoxNode
+  const hasNestedStructure = children.some(
+    child => child.type === 'container' || child.type === 'arrow' || child.type === 'flow'
+  );
+
+  if (!header && !hasNestedStructure) {
+    // This is a simple box, not a container
+    return null;
+  }
+
   return {
     type: 'container',
     x: topLeft.col,

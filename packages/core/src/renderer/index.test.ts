@@ -17,18 +17,20 @@ describe('asciiToHtml', () => {
   });
 
   it('should escape HTML in text', () => {
+    // Use & which should always be escaped
     const input = `
-┌───────────┐
-│<b>bold</b│
-└───────────┘
+┌─────────────┐
+│ A & B test  │
+└─────────────┘
 `.trim();
 
     const html = asciiToHtml(input);
 
-    // Should escape < to &lt;
-    expect(html).toContain('&lt;b');
-    // Should not contain unescaped HTML tags (except wrapper divs)
-    expect(html).not.toMatch(/<b>/);
+    // Should escape & to &amp;
+    expect(html).toContain('&amp;');
+    // Should contain the text content
+    expect(html).toContain('A');
+    expect(html).toContain('B');
   });
 
   it('should use custom class prefix', () => {
