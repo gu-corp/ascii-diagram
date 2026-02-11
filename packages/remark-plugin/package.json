@@ -1,0 +1,51 @@
+{
+  "name": "@gu-corp/remark-ascii-diagram",
+  "version": "0.1.0",
+  "description": "Remark plugin to convert ASCII diagrams to HTML",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@gu-corp/ascii-diagram": "workspace:*",
+    "unist-util-visit": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/mdast": "^4.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0"
+  },
+  "peerDependencies": {
+    "unified": ">=10.0.0"
+  },
+  "keywords": [
+    "remark",
+    "remark-plugin",
+    "ascii",
+    "diagram",
+    "markdown"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gu-corp/ascii-diagram.git",
+    "directory": "packages/remark-plugin"
+  }
+}
