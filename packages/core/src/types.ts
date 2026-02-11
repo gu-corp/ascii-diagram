@@ -59,10 +59,16 @@ export interface FlowNode extends BaseNode {
  */
 export interface ArrowNode extends BaseNode {
   type: 'arrow';
-  direction: 'left' | 'right' | 'up' | 'down';
+  direction:
+    | 'left'
+    | 'right'
+    | 'up'
+    | 'down'
+    | 'bidirectional-h'
+    | 'bidirectional-v';
   style: 'solid' | 'dashed';
   headStyle: 'filled' | 'open' | 'none';
-  label?: string;  // annotation text next to arrow
+  label?: string; // annotation text next to arrow
 }
 
 /**

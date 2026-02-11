@@ -67,8 +67,10 @@ export function generateCSS(options?: AsciiDiagramOptions): string {
 .${prefix}-arrow {
   display: flex;
   align-items: center;
+  justify-content: center;
   color: var(--${prefix}-border-color);
   font-size: 1.25rem;
+  line-height: 1;
 }
 
 .${prefix}-arrow-right::after {
@@ -85,6 +87,24 @@ export function generateCSS(options?: AsciiDiagramOptions): string {
 
 .${prefix}-arrow-down::after {
   content: '↓';
+}
+
+.${prefix}-arrow-bidirectional-h::after {
+  content: '↔';
+}
+
+.${prefix}-arrow-bidirectional-v::after {
+  content: '↕';
+}
+
+/* Arrow in vertical flow context */
+.${prefix}-flow-vertical > .${prefix}-arrow {
+  margin: 0.25rem 0;
+}
+
+/* Arrow in horizontal flow context */
+.${prefix}-flow-horizontal > .${prefix}-arrow {
+  margin: 0 0.5rem;
 }
 
 /* Line styles */

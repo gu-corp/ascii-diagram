@@ -129,15 +129,16 @@ function renderFlow(flow: FlowNode, opts: Required<AsciiDiagramOptions>): string
  */
 function renderArrow(arrow: ArrowNode, prefix: string): string {
   const dirClass = `${prefix}-arrow-${arrow.direction}`;
+  const styleClass = arrow.style === 'dashed' ? `${prefix}-arrow-dashed` : '';
 
   if (arrow.label) {
     return `<div class="${prefix}-arrow-with-label">
-  <div class="${prefix}-arrow ${dirClass}"></div>
+  <div class="${prefix}-arrow ${dirClass} ${styleClass}"></div>
   <span class="${prefix}-arrow-label">${escapeHtml(arrow.label)}</span>
 </div>`;
   }
 
-  return `<div class="${prefix}-arrow ${dirClass}"></div>`;
+  return `<div class="${prefix}-arrow ${dirClass} ${styleClass}"></div>`;
 }
 
 /**

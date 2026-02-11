@@ -1,6 +1,6 @@
 {
   "name": "@gu-corp/remark-ascii-diagram",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Remark plugin to convert ASCII diagrams to HTML",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -23,7 +23,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@gu-corp/ascii-diagram": "workspace:*",
+    "@gu-corp/ascii-diagram": "^0.2.0",
     "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {

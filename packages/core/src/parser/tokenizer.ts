@@ -19,6 +19,8 @@ export type TokenType =
   | 'arrow-left' // ← ◀ <
   | 'arrow-up' // ↑ ▲ ^
   | 'arrow-down' // ↓ ▼ v
+  | 'arrow-bidirectional-h' // ↔ ⇄
+  | 'arrow-bidirectional-v' // ↕ ⇅
   | 'text' // any other character
   | 'space'; // whitespace
 
@@ -85,6 +87,14 @@ const CHAR_MAP: Record<string, TokenType> = {
   '↓': 'arrow-down',
   '▼': 'arrow-down',
   // 'v': 'arrow-down', // conflict with text
+
+  // Bidirectional arrows
+  '↔': 'arrow-bidirectional-h',
+  '⇄': 'arrow-bidirectional-h',
+  '⇔': 'arrow-bidirectional-h',
+  '↕': 'arrow-bidirectional-v',
+  '⇅': 'arrow-bidirectional-v',
+  '⇕': 'arrow-bidirectional-v',
 };
 
 /**

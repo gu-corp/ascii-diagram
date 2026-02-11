@@ -1,6 +1,6 @@
 {
   "name": "@gu-corp/ascii-diagram",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Convert ASCII art diagrams to HTML/CSS",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
